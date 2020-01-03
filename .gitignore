@@ -442,4 +442,6 @@ hs_err_pid*
 
 !/gradle/wrapper/gradle-wrapper.jar
 
+.idea
+
 # End of https://www.gitignore.io/api/dart,swift,xcode,android,intellij,cocoapods,objective-c,androidstudio
