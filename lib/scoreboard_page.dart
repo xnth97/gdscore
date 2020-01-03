@@ -152,7 +152,7 @@ class _ScoreboardState extends State<ScoreboardPage> {
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: FlatButton(
               child: Text('重设总比分'),
-              textColor: themeData.primaryColor,
+              textColor: themeData.errorColor,
               onPressed: () {
                 showActionAlert(
                     context: context,

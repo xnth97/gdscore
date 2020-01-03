@@ -4,6 +4,8 @@ import 'about_page.dart';
 class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var themeData = Theme.of(context);
+
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -20,7 +22,7 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: themeData.primaryColor,
             ),
           ),
 //          ListTile(
@@ -32,6 +34,7 @@ class AppDrawer extends StatelessWidget {
 //          Divider(),
           ListTile(
             title: Text('关于'),
+            leading: Icon(Icons.help),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context,

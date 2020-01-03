@@ -57,7 +57,7 @@ class GDGame {
     lastWinner = side;
     if (scoreMap[side] == 1) {
       // win this round
-      totalScoreMap[side] ++;
+      totalScoreMap[side]++;
       scoreMap[side] = scoreWin;
       return;
     }
@@ -77,7 +77,7 @@ class GDGame {
 
     var otherSide = GDGame.getOtherSide(side);
     if (scoreMap[otherSide] == 1) {
-      numOfA[otherSide] ++;
+      numOfA[otherSide]++;
       if (numOfA[otherSide] == maxRoundOfA) {
         scoreMap[otherSide] = 2;
         numOfA[otherSide] = 0;

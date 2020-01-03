@@ -20,6 +20,7 @@ class App extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primaryColor: Colors.blue,
+        errorColor: Colors.red,
       ),
       home: ScoreboardPage(),
     );
