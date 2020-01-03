@@ -21,6 +21,7 @@ class App extends StatelessWidget {
         // is not restarted.
         primaryColor: Colors.blue,
         errorColor: Colors.red,
+        accentColor: Colors.pink,
       ),
       home: ScoreboardPage(),
     );

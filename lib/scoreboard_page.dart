@@ -20,6 +20,10 @@ class _ScoreboardState extends State<ScoreboardPage> {
   final GlobalKey<_ScoreboardViewState> _rightScoreboardState =
       GlobalKey<_ScoreboardViewState>();
 
+  static const String _newGameButtonTitle = '新开局';
+  static const String _restartGameButtonTitle = '重新开始';
+  static const String _resetGameButtonTitle = '重设总比分';
+
   void updateScore() {
     setState(() {
       _leftScore = GDGame().getTotalScore(GameSide.left);
@@ -57,7 +61,7 @@ class _ScoreboardState extends State<ScoreboardPage> {
               ),
               FlatButton(
                 child: Text(actionTitle),
-                textColor: Colors.red,
+                textColor: Theme.of(context).errorColor,
                 onPressed: () {
                   action();
                   Navigator.of(context).pop();
@@ -68,105 +72,164 @@ class _ScoreboardState extends State<ScoreboardPage> {
         });
   }
 
+  void showActionSheet({context: BuildContext}) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return BottomSheet(
+            enableDrag: true,
+            onClosing: () {},
+            builder: (context) => ListView(
+              children: <Widget>[
+                ListTile(
+                  title: Text(_newGameButtonTitle),
+                  leading: Icon(Icons.play_arrow),
+                  enabled: _hasWinner,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _newGame();
+                  },
+                ),
+                ListTile(
+                  title: Text(_restartGameButtonTitle),
+                  leading: Icon(Icons.replay),
+                  enabled: !_hasWinner,
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _restartThisGame();
+                  },
+                ),
+                ListTile(
+                  title: Text(
+                    _resetGameButtonTitle,
+                    style: TextStyle(color: Theme.of(context).errorColor),
+                  ),
+                  leading:
+                      Icon(Icons.restore, color: Theme.of(context).errorColor),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    showActionAlert(
+                        context: context,
+                        title: '重设总比分',
+                        content: '确定要重设总比分？',
+                        actionTitle: '确定',
+                        action: () {
+                          GDGame().reset();
+                          updateScore();
+                        });
+                  },
+                ),
+                ListTile(
+                  title: Text('取消'),
+                  leading: Icon(Icons.close),
+                  onTap: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  void _restartThisGame() {
+    showActionAlert(
+        context: context,
+        title: _restartGameButtonTitle,
+        content: '确定要重新开始本局？',
+        actionTitle: '确定',
+        action: () {
+          GDGame().newGame();
+          updateScore();
+        });
+  }
+
+  void _newGame() {
+    GDGame().newGame();
+    updateScore();
+  }
+
+  Widget _buildFAB() {
+    var newGameTitle = _hasWinner ? _newGameButtonTitle : _restartGameButtonTitle;
+    var fabIcon = _hasWinner ? Icons.play_arrow : Icons.replay;
+
+    return FloatingActionButton.extended(
+      onPressed: () {
+        if (_hasWinner) {
+          _newGame();
+        } else {
+          _restartThisGame();
+        }
+      },
+      label: Text(newGameTitle),
+      icon: Icon(fabIcon),
+      backgroundColor: Theme.of(context).accentColor,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    var newGameTitle = _hasWinner ? '新开一局' : '重新开始本局';
-    var themeData = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text('记分板'),
-      ),
-      drawer: AppDrawer(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: ScoreboardView(
-                    key: _leftScoreboardState,
-                    side: GameSide.left,
-                    parent: this),
-              ),
-              Expanded(
-                flex: 5,
-                child: ScoreboardView(
-                    key: _rightScoreboardState,
-                    side: GameSide.right,
-                    parent: this),
-              ),
-            ],
-          ),
-          SizedBox(height: 32),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text('总比分'),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Text(
-                _leftScore,
-                style: TextStyle(
-                  fontSize: 36.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Text(
-                _rightScore,
-                style: TextStyle(
-                  fontSize: 36.0,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 24.0),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: FlatButton(
-              child: Text(newGameTitle),
-              textColor: themeData.primaryColor,
-              onPressed: () {
-                if (_hasWinner) {
-                  GDGame().newGame();
-                  updateScore();
-                } else {
-                  showActionAlert(
-                      context: context,
-                      title: newGameTitle,
-                      content: '确定要$newGameTitle？',
-                      actionTitle: '确定',
-                      action: () {
-                        GDGame().newGame();
-                        updateScore();
-                      });
-                }
-              },
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: FlatButton(
-              child: Text('重设总比分'),
-              textColor: themeData.errorColor,
-              onPressed: () {
-                showActionAlert(
-                    context: context,
-                    title: '重设总比分',
-                    content: '确定要重设总比分？',
-                    actionTitle: '确定',
-                    action: () {
-                      GDGame().reset();
-                      updateScore();
-                    });
-              },
-            ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.more_vert),
+            onPressed: () {
+              showActionSheet(context: context);
+            },
           ),
         ],
+      ),
+      drawer: AppDrawer(),
+      floatingActionButton: _buildFAB(),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: ScoreboardView(
+                      key: _leftScoreboardState,
+                      side: GameSide.left,
+                      parent: this),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: ScoreboardView(
+                      key: _rightScoreboardState,
+                      side: GameSide.right,
+                      parent: this),
+                ),
+              ],
+            ),
+            SizedBox(height: 32),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Text('总比分'),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Text(
+                  _leftScore,
+                  style: TextStyle(
+                    fontSize: 36.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  _rightScore,
+                  style: TextStyle(
+                    fontSize: 36.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -240,7 +303,7 @@ class _ScoreboardViewState extends State<ScoreboardView> {
             },
           ),
           RaisedButton(
-            child: Text('一三'),
+            child: Text('一三名'),
             textColor: Colors.white,
             color: Theme.of(context).primaryColor,
             onPressed: () {
@@ -248,7 +311,7 @@ class _ScoreboardViewState extends State<ScoreboardView> {
             },
           ),
           RaisedButton(
-            child: Text('一四'),
+            child: Text('一四名'),
             textColor: Colors.white,
             color: Theme.of(context).primaryColor,
             onPressed: () {
