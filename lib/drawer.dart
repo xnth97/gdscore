@@ -8,6 +8,7 @@ class AppDrawer extends StatelessWidget {
 
     return Drawer(
       child: ListView(
+        padding: EdgeInsets.all(0.0),
         children: <Widget>[
           DrawerHeader(
             child: Center(

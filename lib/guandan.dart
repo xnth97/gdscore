@@ -94,6 +94,18 @@ class GDGame {
     }
   }
 
+  void setScore(GameSide side, int score, {bool isTotalScore = false}) {
+    if (isTotalScore) {
+      if (scoreMap.keys.contains(side)) {
+        scoreMap[side] = score;
+      }
+    } else {
+      if (totalScoreMap.keys.contains(side)) {
+        totalScoreMap[side] = score;
+      }
+    }
+  }
+
   String getScore(GameSide side) {
     return GDGame.getScoreString(scoreMap[side]) ?? '2';
   }

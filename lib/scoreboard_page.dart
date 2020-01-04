@@ -6,9 +6,7 @@ class ScoreboardPage extends StatefulWidget {
   final _ScoreboardState state = _ScoreboardState();
 
   @override
-  State<StatefulWidget> createState() {
-    return state;
-  }
+  State<StatefulWidget> createState() => state;
 }
 
 class _ScoreboardState extends State<ScoreboardPage> {
@@ -40,94 +38,92 @@ class _ScoreboardState extends State<ScoreboardPage> {
   }
 
   void showActionAlert(
-      {context: BuildContext,
-      title: String,
-      content: String,
-      actionTitle: String,
-      action: Function}) {
+      {@required BuildContext context,
+      @required String title,
+      String content,
+      String actionTitle,
+      void Function() action}) {
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(title),
-            content: Text(content),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('取消'),
-                textColor: Theme.of(context).primaryColor,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              FlatButton(
-                child: Text(actionTitle),
-                textColor: Theme.of(context).errorColor,
-                onPressed: () {
-                  action();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('取消'),
+            textColor: Theme.of(context).primaryColor,
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          FlatButton(
+            child: Text(actionTitle),
+            textColor: Theme.of(context).errorColor,
+            onPressed: () {
+              action();
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
-  void showActionSheet({context: BuildContext}) {
+  void showActionSheet({@required BuildContext context}) {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return BottomSheet(
-            enableDrag: true,
-            onClosing: () {},
-            builder: (context) => ListView(
-              children: <Widget>[
-                ListTile(
-                  title: Text(_newGameButtonTitle),
-                  leading: Icon(Icons.play_arrow),
-                  enabled: _hasWinner,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _newGame();
-                  },
-                ),
-                ListTile(
-                  title: Text(_restartGameButtonTitle),
-                  leading: Icon(Icons.replay),
-                  enabled: !_hasWinner,
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _restartThisGame();
-                  },
-                ),
-                ListTile(
-                  title: Text(
-                    _resetGameButtonTitle,
-                    style: TextStyle(color: Theme.of(context).errorColor),
-                  ),
-                  leading:
-                      Icon(Icons.restore, color: Theme.of(context).errorColor),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    showActionAlert(
-                        context: context,
-                        title: '重设总比分',
-                        content: '确定要重设总比分？',
-                        actionTitle: '确定',
-                        action: () {
-                          GDGame().reset();
-                          updateScore();
-                        });
-                  },
-                ),
-                ListTile(
-                  title: Text('取消'),
-                  leading: Icon(Icons.close),
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-              ],
+      context: context,
+      builder: (BuildContext context) => BottomSheet(
+        enableDrag: true,
+        onClosing: () {},
+        builder: (context) => ListView(
+          children: <Widget>[
+            ListTile(
+              title: Text(_newGameButtonTitle),
+              leading: Icon(Icons.play_arrow),
+              enabled: _hasWinner,
+              onTap: () {
+                Navigator.of(context).pop();
+                _newGame();
+              },
             ),
-          );
-        });
+            ListTile(
+              title: Text(_restartGameButtonTitle),
+              leading: Icon(Icons.replay),
+              enabled: !_hasWinner,
+              onTap: () {
+                Navigator.of(context).pop();
+                _restartThisGame();
+              },
+            ),
+            ListTile(
+              title: Text(
+                _resetGameButtonTitle,
+                style: TextStyle(color: Theme.of(context).errorColor),
+              ),
+              leading: Icon(Icons.restore, color: Theme.of(context).errorColor),
+              onTap: () {
+                Navigator.of(context).pop();
+                showActionAlert(
+                    context: context,
+                    title: '重设总比分',
+                    content: '确定要重设总比分？',
+                    actionTitle: '确定',
+                    action: () {
+                      GDGame().reset();
+                      updateScore();
+                    });
+              },
+            ),
+            Divider(),
+            ListTile(
+              title: Text('取消'),
+              leading: Icon(Icons.close),
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _restartThisGame() {
@@ -148,7 +144,8 @@ class _ScoreboardState extends State<ScoreboardPage> {
   }
 
   Widget _buildFAB() {
-    var newGameTitle = _hasWinner ? _newGameButtonTitle : _restartGameButtonTitle;
+    var newGameTitle =
+        _hasWinner ? _newGameButtonTitle : _restartGameButtonTitle;
     var fabIcon = _hasWinner ? Icons.play_arrow : Icons.replay;
 
     return FloatingActionButton.extended(
@@ -243,9 +240,7 @@ class ScoreboardView extends StatefulWidget {
   ScoreboardView({Key key, this.side, this.parent}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return state;
-  }
+  State<StatefulWidget> createState() => state;
 }
 
 class _ScoreboardViewState extends State<ScoreboardView> {
