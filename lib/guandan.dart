@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 enum GameSide {
   left,
   right,
@@ -24,7 +26,11 @@ class GDGame {
   static const scoreWin = 99;
   static const maxRoundOfA = 2;
 
+  static LinkedHashMap<int, String> _scoreToStringMap;
+  static LinkedHashMap<String, int> _stringToScoreMap;
+
   GDGame._internal() {
+    GDGame._buildScoreToStringMaps();
     reset();
   }
 
@@ -106,6 +112,16 @@ class GDGame {
     }
   }
 
+  void setScoreMap(
+      {Map<GameSide, int> scoreMap, Map<GameSide, int> totalScoreMap}) {
+    if (scoreMap != null) {
+      this.scoreMap = scoreMap;
+    }
+    if (totalScoreMap != null) {
+      this.totalScoreMap = totalScoreMap;
+    }
+  }
+
   String getScore(GameSide side) {
     return GDGame.getScoreString(scoreMap[side]) ?? '2';
   }
@@ -127,23 +143,40 @@ class GDGame {
     return null;
   }
 
-  static String getScoreString(int score) {
-    if (score == scoreWin) {
-      return '胜';
+  static void _buildScoreToStringMaps() {
+    _scoreToStringMap = LinkedHashMap.of({
+      1: 'A',
+    });
+    for (int i = 2; i < 11; i++) {
+      _scoreToStringMap[i] = i.toString();
     }
-    if (score < 1 || score > 13) {
-      return null;
-    }
-    if (score > 1 && score <= 10) {
-      return score.toString();
-    }
-    const map = {
+    _scoreToStringMap.addAll({
       11: 'J',
       12: 'Q',
       13: 'K',
-      1: 'A',
-    };
-    return map[score];
+      scoreWin: '胜',
+    });
+    _stringToScoreMap = LinkedHashMap();
+    for (var key in _scoreToStringMap.keys) {
+      var val = _scoreToStringMap[key];
+      _stringToScoreMap[val] = key;
+    }
+  }
+
+  static String getScoreString(int score) {
+    return _scoreToStringMap[score];
+  }
+
+  static int getScoreFromString(String str) {
+    return _stringToScoreMap[str];
+  }
+
+  static List<int> getAllScores() {
+    return _scoreToStringMap.keys.toList();
+  }
+
+  static List<String> getAllScoreStrings() {
+    return _stringToScoreMap.keys.toList();
   }
 
   static GameSide getOtherSide(GameSide side) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'drawer.dart';
 import 'guandan.dart';
+import 'edit_page.dart';
 
 class ScoreboardPage extends StatefulWidget {
   final _ScoreboardState state = _ScoreboardState();
@@ -96,6 +97,14 @@ class _ScoreboardState extends State<ScoreboardPage> {
               },
             ),
             ListTile(
+              title: Text('编辑比分'),
+              leading: Icon(Icons.edit),
+              onTap: () {
+                Navigator.of(context).pop();
+                showEditPage();
+              },
+            ),
+            ListTile(
               title: Text(
                 _resetGameButtonTitle,
                 style: TextStyle(color: Theme.of(context).errorColor),
@@ -124,6 +133,12 @@ class _ScoreboardState extends State<ScoreboardPage> {
         ),
       ),
     );
+  }
+
+  void showEditPage() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => EditPage()))
+        .then((_) => updateScore());
   }
 
   void _restartThisGame() {
