@@ -1,5 +1,7 @@
 import 'dart:collection';
 
+import 'package:flutter/foundation.dart';
+
 enum GameSide {
   left,
   right,
@@ -11,10 +13,10 @@ enum GameWinType {
   oneFour,
 }
 
-class GDGame {
-  static final GDGame _singleton = GDGame._internal();
+class GameModel extends ChangeNotifier {
+  static final GameModel _singleton = GameModel._internal();
 
-  factory GDGame() {
+  factory GameModel() {
     return _singleton;
   }
 
@@ -29,17 +31,17 @@ class GDGame {
   static LinkedHashMap<int, String> _scoreToStringMap;
   static LinkedHashMap<String, int> _stringToScoreMap;
 
-  GDGame._internal() {
-    GDGame._buildScoreToStringMaps();
+  GameModel._internal() {
+    GameModel._buildScoreToStringMaps();
     reset();
   }
 
   void reset() {
-    newGame();
     totalScoreMap = {
       GameSide.left: 0,
       GameSide.right: 0,
     };
+    newGame();
   }
 
   void newGame() {
@@ -52,6 +54,7 @@ class GDGame {
       GameSide.right: 0,
     };
     lastWinner = null;
+    notifyListeners();
   }
 
   void winGame(GameSide side, GameWinType winType) {
@@ -65,8 +68,10 @@ class GDGame {
       // win this round
       totalScoreMap[side]++;
       scoreMap[side] = scoreWin;
+      notifyListeners();
       return;
     }
+
     switch (winType) {
       case GameWinType.oneTwo:
         scoreMap[side] = _updateScore(scoreMap[side], 3);
@@ -81,7 +86,7 @@ class GDGame {
         break;
     }
 
-    var otherSide = GDGame.getOtherSide(side);
+    var otherSide = GameModel.getOtherSide(side);
     if (scoreMap[otherSide] == 1) {
       numOfA[otherSide]++;
       if (numOfA[otherSide] == maxRoundOfA) {
@@ -89,6 +94,7 @@ class GDGame {
         numOfA[otherSide] = 0;
       }
     }
+    notifyListeners();
   }
 
   int _updateScore(int score, int add) {
@@ -110,6 +116,7 @@ class GDGame {
         totalScoreMap[side] = score;
       }
     }
+    notifyListeners();
   }
 
   void setScoreMap(
@@ -120,10 +127,11 @@ class GDGame {
     if (totalScoreMap != null) {
       this.totalScoreMap = totalScoreMap;
     }
+    notifyListeners();
   }
 
   String getScore(GameSide side) {
-    return GDGame.getScoreString(scoreMap[side]) ?? '2';
+    return GameModel.getScoreString(scoreMap[side]) ?? '2';
   }
 
   String getTotalScore(GameSide side) {

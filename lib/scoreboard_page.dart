@@ -1,42 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'drawer.dart';
-import 'guandan.dart';
+import 'game.dart';
 import 'edit_page.dart';
 
-class ScoreboardPage extends StatefulWidget {
-  final _ScoreboardState state = _ScoreboardState();
-
-  @override
-  State<StatefulWidget> createState() => state;
-}
-
-class _ScoreboardState extends State<ScoreboardPage> {
-  String _leftScore = '0';
-  String _rightScore = '0';
-  bool _hasWinner = false;
-  final GlobalKey<_ScoreboardViewState> _leftScoreboardState =
-      GlobalKey<_ScoreboardViewState>();
-  final GlobalKey<_ScoreboardViewState> _rightScoreboardState =
-      GlobalKey<_ScoreboardViewState>();
+class ScoreboardPage extends StatelessWidget {
 
   static const String _newGameButtonTitle = '新开局';
   static const String _restartGameButtonTitle = '重新开始';
   static const String _resetGameButtonTitle = '重设总比分';
-
-  void updateScore() {
-    setState(() {
-      _leftScore = GDGame().getTotalScore(GameSide.left);
-      _rightScore = GDGame().getTotalScore(GameSide.right);
-      _hasWinner = GDGame().hasWinner();
-    });
-    _leftScoreboardState.currentState._updateScoreboard();
-    _rightScoreboardState.currentState._updateScoreboard();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   void showActionAlert(
       {@required BuildContext context,
@@ -70,7 +42,7 @@ class _ScoreboardState extends State<ScoreboardPage> {
     );
   }
 
-  void showActionSheet({@required BuildContext context}) {
+  void showActionSheet(bool newGameEnabled, bool restartEnabled, {@required BuildContext context}) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) => BottomSheet(
@@ -81,7 +53,7 @@ class _ScoreboardState extends State<ScoreboardPage> {
             ListTile(
               title: Text(_newGameButtonTitle),
               leading: Icon(Icons.play_arrow),
-              enabled: _hasWinner,
+              enabled: newGameEnabled,
               onTap: () {
                 Navigator.of(context).pop();
                 _newGame();
@@ -90,10 +62,10 @@ class _ScoreboardState extends State<ScoreboardPage> {
             ListTile(
               title: Text(_restartGameButtonTitle),
               leading: Icon(Icons.replay),
-              enabled: !_hasWinner,
+              enabled: restartEnabled,
               onTap: () {
                 Navigator.of(context).pop();
-                _restartThisGame();
+                _restartThisGame(context: context);
               },
             ),
             ListTile(
@@ -101,7 +73,7 @@ class _ScoreboardState extends State<ScoreboardPage> {
               leading: Icon(Icons.edit),
               onTap: () {
                 Navigator.of(context).pop();
-                showEditPage();
+                showEditPage(context: context);
               },
             ),
             ListTile(
@@ -118,8 +90,7 @@ class _ScoreboardState extends State<ScoreboardPage> {
                     content: '确定要重设总比分？',
                     actionTitle: '确定',
                     action: () {
-                      GDGame().reset();
-                      updateScore();
+                      GameModel().reset();
                     });
               },
             ),
@@ -135,40 +106,38 @@ class _ScoreboardState extends State<ScoreboardPage> {
     );
   }
 
-  void showEditPage() {
+  void showEditPage({@required BuildContext context}) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => EditPage()))
-        .then((_) => updateScore());
+        .push(MaterialPageRoute(builder: (context) => EditPage()));
   }
 
-  void _restartThisGame() {
+  void _restartThisGame({@required BuildContext context}) {
     showActionAlert(
         context: context,
         title: _restartGameButtonTitle,
         content: '确定要重新开始本局？',
         actionTitle: '确定',
         action: () {
-          GDGame().newGame();
-          updateScore();
+          GameModel().newGame();
         });
   }
 
   void _newGame() {
-    GDGame().newGame();
-    updateScore();
+    GameModel().newGame();
+//    updateScore();
   }
 
-  Widget _buildFAB() {
+  Widget _buildFAB(bool hasWinner, {@required BuildContext context}) {
     var newGameTitle =
-        _hasWinner ? _newGameButtonTitle : _restartGameButtonTitle;
-    var fabIcon = _hasWinner ? Icons.play_arrow : Icons.replay;
+        hasWinner ? _newGameButtonTitle : _restartGameButtonTitle;
+    var fabIcon = hasWinner ? Icons.play_arrow : Icons.replay;
 
     return FloatingActionButton.extended(
       onPressed: () {
-        if (_hasWinner) {
+        if (hasWinner) {
           _newGame();
         } else {
-          _restartThisGame();
+          _restartThisGame(context: context);
         }
       },
       label: Text(newGameTitle),
@@ -183,16 +152,24 @@ class _ScoreboardState extends State<ScoreboardPage> {
       appBar: AppBar(
         title: Text('记分板'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.more_vert),
-            onPressed: () {
-              showActionSheet(context: context);
+          Consumer<GameModel>(
+            builder: (context, model, child) {
+              return IconButton(
+                icon: Icon(Icons.more_vert),
+                onPressed: () {
+                  showActionSheet(model.hasWinner(), !model.hasWinner(), context: context);
+                },
+              );
             },
           ),
         ],
       ),
       drawer: AppDrawer(),
-      floatingActionButton: _buildFAB(),
+      floatingActionButton: Consumer<GameModel>(
+        builder: (context, model, child) {
+          return _buildFAB(model.hasWinner(), context: context);
+        },
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -202,17 +179,11 @@ class _ScoreboardState extends State<ScoreboardPage> {
               children: <Widget>[
                 Expanded(
                   flex: 5,
-                  child: ScoreboardView(
-                      key: _leftScoreboardState,
-                      side: GameSide.left,
-                      parent: this),
+                  child: ScoreboardView(side: GameSide.left),
                 ),
                 Expanded(
                   flex: 5,
-                  child: ScoreboardView(
-                      key: _rightScoreboardState,
-                      side: GameSide.right,
-                      parent: this),
+                  child: ScoreboardView(side: GameSide.right),
                 ),
               ],
             ),
@@ -221,24 +192,28 @@ class _ScoreboardState extends State<ScoreboardPage> {
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text('总比分'),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Text(
-                  _leftScore,
-                  style: TextStyle(
-                    fontSize: 36.0,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  _rightScore,
-                  style: TextStyle(
-                    fontSize: 36.0,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
+            Consumer<GameModel>(
+              builder: (context, model, child) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Text(
+                      model.getTotalScore(GameSide.left),
+                      style: TextStyle(
+                        fontSize: 36.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      model.getTotalScore(GameSide.right),
+                      style: TextStyle(
+                        fontSize: 36.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -247,36 +222,13 @@ class _ScoreboardState extends State<ScoreboardPage> {
   }
 }
 
-class ScoreboardView extends StatefulWidget {
+class ScoreboardView extends StatelessWidget {
   final GameSide side;
-  final _ScoreboardState parent;
-  final _ScoreboardViewState state = _ScoreboardViewState();
 
-  ScoreboardView({Key key, this.side, this.parent}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => state;
-}
-
-class _ScoreboardViewState extends State<ScoreboardView> {
-  String _score = '2';
-  bool _isLastWinner = false;
-
-  void _updateScoreboard() {
-    setState(() {
-      _score = GDGame().getScore(widget.side);
-      _isLastWinner = (GDGame().lastWinner == widget.side);
-    });
-  }
+  ScoreboardView({Key key, this.side}) : super(key: key);
 
   void _winGame(GameWinType winType) {
-    GDGame().winGame(widget.side, winType);
-    widget.parent.updateScore();
-  }
-
-  @override
-  void initState() {
-    super.initState();
+    GameModel().winGame(side, winType);
   }
 
   @override
@@ -292,15 +244,19 @@ class _ScoreboardViewState extends State<ScoreboardView> {
           SizedBox(
             height: 96.0,
             child: Center(
-              child: Text(
-                _score,
-                style: TextStyle(
-                  fontSize: 64.0,
-                  fontWeight: FontWeight.w800,
-                  color: _isLastWinner
-                      ? Theme.of(context).primaryColor
-                      : Colors.black,
-                ),
+              child: Consumer<GameModel>(
+                builder: (context, model, child) {
+                  return Text(
+                    model.getScore(side),
+                    style: TextStyle(
+                      fontSize: 64.0,
+                      fontWeight: FontWeight.w800,
+                      color: model.lastWinner == side
+                          ? Theme.of(context).primaryColor
+                          : Colors.black,
+                    ),
+                  );
+                },
               ),
             ),
           ),

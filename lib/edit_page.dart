@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'guandan.dart';
+import 'game.dart';
 
 class EditPage extends StatefulWidget {
   @override
@@ -7,11 +7,11 @@ class EditPage extends StatefulWidget {
 }
 
 class _EditPageState extends State<EditPage> {
-  Map<GameSide, int> _editedScore = Map.from(GDGame().scoreMap);
-  Map<GameSide, int> _editedTotalScore = Map.from(GDGame().totalScoreMap);
+  Map<GameSide, int> _editedScore = Map.from(GameModel().scoreMap);
+  Map<GameSide, int> _editedTotalScore = Map.from(GameModel().totalScoreMap);
 
   void saveEdit() {
-    GDGame().setScoreMap(
+    GameModel().setScoreMap(
       scoreMap: _editedScore,
       totalScoreMap: _editedTotalScore,
     );
@@ -19,15 +19,15 @@ class _EditPageState extends State<EditPage> {
 
   Widget _buildScoreButton(GameSide side) {
     return DropdownButton<String>(
-      value: GDGame.getScoreString(_editedScore[side]),
-      items: GDGame.getAllScoreStrings().map<DropdownMenuItem<String>>(
+      value: GameModel.getScoreString(_editedScore[side]),
+      items: GameModel.getAllScoreStrings().map<DropdownMenuItem<String>>(
           (String val) => DropdownMenuItem<String>(
                 value: val,
                 child: Text(val),
               )).toList(),
       onChanged: (String val) {
         setState(() {
-          _editedScore[side] = GDGame.getScoreFromString(val);
+          _editedScore[side] = GameModel.getScoreFromString(val);
         });
       },
     );

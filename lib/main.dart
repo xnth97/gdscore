@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gdscore/game.dart';
+import 'package:provider/provider.dart';
 import 'scoreboard_page.dart';
 
 void main() => runApp(App());
@@ -23,7 +25,10 @@ class App extends StatelessWidget {
         errorColor: Colors.red,
         accentColor: Colors.pink,
       ),
-      home: ScoreboardPage(),
+      home: ChangeNotifierProvider(
+        create: (context) => GameModel(),
+        child: ScoreboardPage(),
+      ),
     );
   }
 }
