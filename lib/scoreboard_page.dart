@@ -10,28 +10,28 @@ class ScoreboardPage extends StatelessWidget {
   static const String _restartGameButtonTitle = '重新开始';
   static const String _resetGameButtonTitle = '重设总比分';
 
+  const ScoreboardPage({Key? key}) : super(key: key);
+
   void showActionAlert(
-      {@required BuildContext context,
-      @required String title,
-      String content,
-      String actionTitle,
-      void Function() action}) {
+      {required BuildContext context,
+      required String title,
+      required String content,
+      required String actionTitle,
+      required void Function() action}) {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
         title: Text(title),
         content: Text(content),
         actions: <Widget>[
-          FlatButton(
-            child: Text('取消'),
-            textColor: Theme.of(context).primaryColor,
+          TextButton(
+            child: const Text('取消'),
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
-          FlatButton(
+          TextButton(
             child: Text(actionTitle),
-            textColor: Theme.of(context).errorColor,
             onPressed: () {
               action();
               Navigator.of(context).pop();
@@ -42,7 +42,7 @@ class ScoreboardPage extends StatelessWidget {
     );
   }
 
-  void showActionSheet(bool newGameEnabled, bool restartEnabled, {@required BuildContext context}) {
+  void showActionSheet(bool newGameEnabled, bool restartEnabled, {required BuildContext context}) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) => BottomSheet(
@@ -106,12 +106,12 @@ class ScoreboardPage extends StatelessWidget {
     );
   }
 
-  void showEditPage({@required BuildContext context}) {
+  void showEditPage({required BuildContext context}) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => EditPage()));
   }
 
-  void _restartThisGame({@required BuildContext context}) {
+  void _restartThisGame({required BuildContext context}) {
     showActionAlert(
         context: context,
         title: _restartGameButtonTitle,
@@ -127,7 +127,7 @@ class ScoreboardPage extends StatelessWidget {
 //    updateScore();
   }
 
-  Widget _buildFAB(bool hasWinner, {@required BuildContext context}) {
+  Widget _buildFAB(bool hasWinner, {required BuildContext context}) {
     var newGameTitle =
         hasWinner ? _newGameButtonTitle : _restartGameButtonTitle;
     var fabIcon = hasWinner ? Icons.play_arrow : Icons.replay;
@@ -150,12 +150,12 @@ class ScoreboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('记分板'),
+        title: const Text('记分板'),
         actions: <Widget>[
           Consumer<GameModel>(
             builder: (context, model, child) {
               return IconButton(
-                icon: Icon(Icons.more_vert),
+                icon: const Icon(Icons.more_vert),
                 onPressed: () {
                   showActionSheet(model.hasWinner(), !model.hasWinner(), context: context);
                 },
@@ -187,8 +187,8 @@ class ScoreboardPage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 32),
-            Padding(
+            const SizedBox(height: 32),
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text('总比分'),
             ),
@@ -199,14 +199,14 @@ class ScoreboardPage extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       model.getTotalScore(GameSide.left),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 36.0,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
                       model.getTotalScore(GameSide.right),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 36.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -225,7 +225,7 @@ class ScoreboardPage extends StatelessWidget {
 class ScoreboardView extends StatelessWidget {
   final GameSide side;
 
-  ScoreboardView({Key key, this.side}) : super(key: key);
+  const ScoreboardView({Key? key, required this.side}) : super(key: key);
 
   void _winGame(GameWinType winType) {
     GameModel().winGame(side, winType);
@@ -234,7 +234,7 @@ class ScoreboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 16.0,
         vertical: 32.0,
       ),
@@ -260,26 +260,26 @@ class ScoreboardView extends StatelessWidget {
               ),
             ),
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text('双上'),
-            textColor: Colors.white,
-            color: Theme.of(context).primaryColor,
+            // textColor: Colors.white,
+            // color: Theme.of(context).primaryColor,
             onPressed: () {
               _winGame(GameWinType.oneTwo);
             },
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text('一三名'),
-            textColor: Colors.white,
-            color: Theme.of(context).primaryColor,
+            // textColor: Colors.white,
+            // color: Theme.of(context).primaryColor,
             onPressed: () {
               _winGame(GameWinType.oneThree);
             },
           ),
-          RaisedButton(
+          ElevatedButton(
             child: Text('一四名'),
-            textColor: Colors.white,
-            color: Theme.of(context).primaryColor,
+            // textColor: Colors.white,
+            // color: Theme.of(context).primaryColor,
             onPressed: () {
               _winGame(GameWinType.oneFour);
             },

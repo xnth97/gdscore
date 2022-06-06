@@ -6,6 +6,8 @@ import 'scoreboard_page.dart';
 void main() => runApp(App());
 
 class App extends StatelessWidget {
+  const App({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class App extends StatelessWidget {
         // is not restarted.
         primaryColor: Colors.blue,
         errorColor: Colors.red,
-        accentColor: Colors.pink,
+        useMaterial3: true,
       ),
       home: ChangeNotifierProvider(
         create: (context) => GameModel(),

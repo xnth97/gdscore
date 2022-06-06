@@ -20,16 +20,16 @@ class GameModel extends ChangeNotifier {
     return _singleton;
   }
 
-  Map<GameSide, int> scoreMap;
-  Map<GameSide, int> numOfA;
-  Map<GameSide, int> totalScoreMap;
-  GameSide lastWinner;
+  Map<GameSide, int> scoreMap = {};
+  Map<GameSide, int> numOfA = {};
+  Map<GameSide, int> totalScoreMap = {};
+  GameSide? lastWinner;
 
   static const scoreWin = 99;
   static const maxRoundOfA = 2;
 
-  static LinkedHashMap<int, String> _scoreToStringMap;
-  static LinkedHashMap<String, int> _stringToScoreMap;
+  static LinkedHashMap<int, String> _scoreToStringMap = LinkedHashMap();
+  static LinkedHashMap<String, int> _stringToScoreMap = LinkedHashMap();
 
   GameModel._internal() {
     GameModel._buildScoreToStringMaps();
@@ -66,7 +66,7 @@ class GameModel extends ChangeNotifier {
     lastWinner = side;
     if (scoreMap[side] == 1) {
       // win this round
-      totalScoreMap[side]++;
+      totalScoreMap.update(side, (value) => ++value);
       scoreMap[side] = scoreWin;
       notifyListeners();
       return;
@@ -74,21 +74,21 @@ class GameModel extends ChangeNotifier {
 
     switch (winType) {
       case GameWinType.oneTwo:
-        scoreMap[side] = _updateScore(scoreMap[side], 3);
+        scoreMap[side] = _updateScore(scoreMap[side]!, 3);
         break;
 
       case GameWinType.oneThree:
-        scoreMap[side] = _updateScore(scoreMap[side], 2);
+        scoreMap[side] = _updateScore(scoreMap[side]!, 2);
         break;
 
       case GameWinType.oneFour:
-        scoreMap[side] = _updateScore(scoreMap[side], 1);
+        scoreMap[side] = _updateScore(scoreMap[side]!, 1);
         break;
     }
 
     var otherSide = GameModel.getOtherSide(side);
     if (scoreMap[otherSide] == 1) {
-      numOfA[otherSide]++;
+      numOfA.update(otherSide, (value) => ++value);
       if (numOfA[otherSide] == maxRoundOfA) {
         scoreMap[otherSide] = 2;
         numOfA[otherSide] = 0;
@@ -120,29 +120,25 @@ class GameModel extends ChangeNotifier {
   }
 
   void setScoreMap(
-      {Map<GameSide, int> scoreMap, Map<GameSide, int> totalScoreMap}) {
-    if (scoreMap != null) {
-      this.scoreMap = scoreMap;
-    }
-    if (totalScoreMap != null) {
-      this.totalScoreMap = totalScoreMap;
-    }
+      {required Map<GameSide, int> scoreMap, required Map<GameSide, int> totalScoreMap}) {
+    this.scoreMap = scoreMap;
+    this.totalScoreMap = totalScoreMap;
     notifyListeners();
   }
 
   String getScore(GameSide side) {
-    return GameModel.getScoreString(scoreMap[side]) ?? '2';
+    return GameModel.getScoreString(scoreMap[side]!);
   }
 
   String getTotalScore(GameSide side) {
-    return totalScoreMap[side].toString() ?? '0';
+    return totalScoreMap[side].toString();
   }
 
   bool hasWinner() {
     return scoreMap.values.contains(scoreWin);
   }
 
-  GameSide winnerSide() {
+  GameSide? winnerSide() {
     for (GameSide side in scoreMap.keys) {
       if (scoreMap[side] == scoreWin) {
         return side;
@@ -167,16 +163,16 @@ class GameModel extends ChangeNotifier {
     _stringToScoreMap = LinkedHashMap();
     for (var key in _scoreToStringMap.keys) {
       var val = _scoreToStringMap[key];
-      _stringToScoreMap[val] = key;
+      _stringToScoreMap[val!] = key;
     }
   }
 
   static String getScoreString(int score) {
-    return _scoreToStringMap[score];
+    return _scoreToStringMap[score] ?? '2';
   }
 
   static int getScoreFromString(String str) {
-    return _stringToScoreMap[str];
+    return _stringToScoreMap[str] ?? 2;
   }
 
   static List<int> getAllScores() {

@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'game.dart';
 
 class EditPage extends StatefulWidget {
+  const EditPage({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _EditPageState();
 }
 
 class _EditPageState extends State<EditPage> {
-  Map<GameSide, int> _editedScore = Map.from(GameModel().scoreMap);
-  Map<GameSide, int> _editedTotalScore = Map.from(GameModel().totalScoreMap);
+  final Map<GameSide, int> _editedScore = Map.from(GameModel().scoreMap);
+  final Map<GameSide, int> _editedTotalScore = Map.from(GameModel().totalScoreMap);
 
   void saveEdit() {
     GameModel().setScoreMap(
@@ -19,15 +21,15 @@ class _EditPageState extends State<EditPage> {
 
   Widget _buildScoreButton(GameSide side) {
     return DropdownButton<String>(
-      value: GameModel.getScoreString(_editedScore[side]),
+      value: GameModel.getScoreString(_editedScore[side]!),
       items: GameModel.getAllScoreStrings().map<DropdownMenuItem<String>>(
           (String val) => DropdownMenuItem<String>(
                 value: val,
                 child: Text(val),
               )).toList(),
-      onChanged: (String val) {
+      onChanged: (String? val) {
         setState(() {
-          _editedScore[side] = GameModel.getScoreFromString(val);
+          _editedScore[side] = GameModel.getScoreFromString(val!);
         });
       },
     );

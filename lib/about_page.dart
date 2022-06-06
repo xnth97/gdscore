@@ -13,7 +13,7 @@ class AboutPage extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Text(
-                'gdscore v1.2',
+                'gdscore v1.3',
                 style: TextStyle(
                   fontSize: 22.0,
                 ),
