@@ -36,11 +36,11 @@ class _EditPageState extends State<EditPage> {
   }
 
   Widget _buildTotalScoreTextField(GameSide side) {
-    return Container(
+    return SizedBox(
       width: 96,
       child: TextFormField(
         initialValue: _editedTotalScore[side].toString(),
-        keyboardType: TextInputType.numberWithOptions(
+        keyboardType: const TextInputType.numberWithOptions(
           signed: false,
           decimal: false,
         ),
@@ -56,50 +56,83 @@ class _EditPageState extends State<EditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('编辑比分'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () {
-              saveEdit();
-              Navigator.of(context).pop();
-            },
+    return AlertDialog(
+      title: const Text('编辑比分'),
+      content: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
+            child: Text('本局比分'),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              _buildScoreButton(GameSide.left),
+              _buildScoreButton(GameSide.right),
+            ],
+          ),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
+            child: Text('总比分'),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              _buildTotalScoreTextField(GameSide.left),
+              _buildTotalScoreTextField(GameSide.right),
+            ],
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
-              child: Text('本局比分'),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                _buildScoreButton(GameSide.left),
-                _buildScoreButton(GameSide.right),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
-              child: Text('总比分'),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                _buildTotalScoreTextField(GameSide.left),
-                _buildTotalScoreTextField(GameSide.right),
-              ],
-            ),
-          ],
+      actions: [
+        TextButton(
+          child: const Text('取消'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
-      ),
+        TextButton(
+          child: const Text('修改'),
+          onPressed: () {
+            saveEdit();
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
+    // return  Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       mainAxisSize: MainAxisSize.min,
+    //       crossAxisAlignment: CrossAxisAlignment.stretch,
+    //       children: <Widget>[
+    //         Padding(
+    //           padding: EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
+    //           child: Text('本局比分'),
+    //         ),
+    //         Row(
+    //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //           children: <Widget>[
+    //             _buildScoreButton(GameSide.left),
+    //             _buildScoreButton(GameSide.right),
+    //           ],
+    //         ),
+    //         Padding(
+    //           padding: EdgeInsets.fromLTRB(16.0, 32.0, 16.0, 16.0),
+    //           child: Text('总比分'),
+    //         ),
+    //         Row(
+    //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //           crossAxisAlignment: CrossAxisAlignment.center,
+    //           children: <Widget>[
+    //             _buildTotalScoreTextField(GameSide.left),
+    //             _buildTotalScoreTextField(GameSide.right),
+    //           ],
+    //         ),
+    //       ],
+    // );
   }
 }

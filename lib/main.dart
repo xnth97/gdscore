@@ -29,7 +29,7 @@ class App extends StatelessWidget {
       ),
       home: ChangeNotifierProvider(
         create: (context) => GameModel(),
-        child: ScoreboardPage(),
+        child: const ScoreboardPage(),
       ),
     );
   }

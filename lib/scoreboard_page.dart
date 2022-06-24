@@ -48,67 +48,70 @@ class ScoreboardPage extends StatelessWidget {
       builder: (BuildContext context) => BottomSheet(
         enableDrag: true,
         onClosing: () {},
-        builder: (context) => ListView(
-          children: <Widget>[
-            ListTile(
-              title: Text(_newGameButtonTitle),
-              leading: Icon(Icons.play_arrow),
-              enabled: newGameEnabled,
-              onTap: () {
-                Navigator.of(context).pop();
-                _newGame();
-              },
-            ),
-            ListTile(
-              title: Text(_restartGameButtonTitle),
-              leading: Icon(Icons.replay),
-              enabled: restartEnabled,
-              onTap: () {
-                Navigator.of(context).pop();
-                _restartThisGame(context: context);
-              },
-            ),
-            ListTile(
-              title: Text('编辑比分'),
-              leading: Icon(Icons.edit),
-              onTap: () {
-                Navigator.of(context).pop();
-                showEditPage(context: context);
-              },
-            ),
-            ListTile(
-              title: Text(
-                _resetGameButtonTitle,
-                style: TextStyle(color: Theme.of(context).errorColor),
+        builder: (context) => SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                title: const Text(_newGameButtonTitle),
+                leading: const Icon(Icons.play_arrow),
+                enabled: newGameEnabled,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _newGame();
+                },
               ),
-              leading: Icon(Icons.restore, color: Theme.of(context).errorColor),
-              onTap: () {
-                Navigator.of(context).pop();
-                showActionAlert(
-                    context: context,
-                    title: '重设总比分',
-                    content: '确定要重设总比分？',
-                    actionTitle: '确定',
-                    action: () {
-                      GameModel().reset();
-                    });
-              },
-            ),
-            Divider(),
-            ListTile(
-              title: Text('取消'),
-              leading: Icon(Icons.close),
-              onTap: () => Navigator.of(context).pop(),
-            ),
-          ],
+              ListTile(
+                title: const Text(_restartGameButtonTitle),
+                leading: const Icon(Icons.replay),
+                enabled: restartEnabled,
+                onTap: () {
+                  Navigator.of(context).pop();
+                  _restartThisGame(context: context);
+                },
+              ),
+              ListTile(
+                title: const Text('编辑比分'),
+                leading: const Icon(Icons.edit),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showEditPage(context: context);
+                },
+              ),
+              ListTile(
+                title: Text(
+                  _resetGameButtonTitle,
+                  style: TextStyle(color: Theme.of(context).errorColor),
+                ),
+                leading: Icon(Icons.restore, color: Theme.of(context).errorColor),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  showActionAlert(
+                      context: context,
+                      title: '重设总比分',
+                      content: '确定要重设总比分？',
+                      actionTitle: '确定',
+                      action: () {
+                        GameModel().reset();
+                      });
+                },
+              ),
+              const Divider(),
+              ListTile(
+                title: const Text('取消'),
+                leading: const Icon(Icons.close),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   void showEditPage({required BuildContext context}) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => EditPage()));
+    // Navigator.of(context)
+    //     .push(MaterialPageRoute(builder: (context) => const EditPage()));
+    showDialog(context: context, builder: (context) => const EditPage());
   }
 
   void _restartThisGame({required BuildContext context}) {
@@ -142,7 +145,7 @@ class ScoreboardPage extends StatelessWidget {
       },
       label: Text(newGameTitle),
       icon: Icon(fabIcon),
-      backgroundColor: Theme.of(context).accentColor,
+      backgroundColor: Theme.of(context).colorScheme.secondary,
     );
   }
 
@@ -176,7 +179,7 @@ class ScoreboardPage extends StatelessWidget {
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
+              children: const <Widget>[
                 Expanded(
                   flex: 5,
                   child: ScoreboardView(side: GameSide.left),
@@ -261,23 +264,25 @@ class ScoreboardView extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            child: Text('双上'),
+            child: const Text('双上'),
             // textColor: Colors.white,
             // color: Theme.of(context).primaryColor,
             onPressed: () {
               _winGame(GameWinType.oneTwo);
             },
           ),
+          const SizedBox(height: 8),
           ElevatedButton(
-            child: Text('一三名'),
+            child: const Text('一三名'),
             // textColor: Colors.white,
             // color: Theme.of(context).primaryColor,
             onPressed: () {
               _winGame(GameWinType.oneThree);
             },
           ),
+          const SizedBox(height: 8),
           ElevatedButton(
-            child: Text('一四名'),
+            child: const Text('一四名'),
             // textColor: Colors.white,
             // color: Theme.of(context).primaryColor,
             onPressed: () {
