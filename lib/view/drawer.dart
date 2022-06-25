@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:gdscore/view/history_page.dart';
 import 'about_page.dart';
 
 class AppDrawer extends StatelessWidget {
+  const AppDrawer({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
 
     return Drawer(
       child: ListView(
-        padding: EdgeInsets.all(0.0),
+        padding: const EdgeInsets.all(0.0),
         children: <Widget>[
           DrawerHeader(
-            child: Center(
+            decoration: BoxDecoration(
+              color: themeData.primaryColor,
+            ),
+            child: const Center(
               child: Text(
                 'gdscore',
                 style: TextStyle(
@@ -22,24 +28,23 @@ class AppDrawer extends StatelessWidget {
                 ),
               ),
             ),
-            decoration: BoxDecoration(
-              color: themeData.primaryColor,
-            ),
           ),
-//          ListTile(
-//            title: Text('历史'),
-//            onTap: () {
-//              Navigator.pop(context);
-//            },
-//          ),
-//          Divider(),
+         ListTile(
+           title: const Text('历史'),
+           leading: const Icon(Icons.history),
+           onTap: () {
+             Navigator.pop(context);
+             Navigator.push(context, MaterialPageRoute(builder: (context) => const HistoryPage()));
+           },
+         ),
+         const Divider(),
           ListTile(
-            title: Text('关于'),
-            leading: Icon(Icons.help),
+            title: const Text('关于'),
+            leading: const Icon(Icons.help),
             onTap: () {
               Navigator.pop(context);
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => AboutPage()));
+                  MaterialPageRoute(builder: (context) => const AboutPage()));
             },
           ),
         ],

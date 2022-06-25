@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'drawer.dart';
-import 'game.dart';
+import '../model/game.dart';
 import 'edit_page.dart';
 
 class ScoreboardPage extends StatelessWidget {

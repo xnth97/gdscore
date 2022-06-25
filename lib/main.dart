@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gdscore/game.dart';
+import 'package:gdscore/model/game.dart';
 import 'package:provider/provider.dart';
-import 'scoreboard_page.dart';
+import 'view/scoreboard_page.dart';
 
 void main() => runApp(App());
 

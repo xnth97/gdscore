@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:gdscore/model/history.dart';
 
 enum GameSide {
   left,
@@ -20,16 +21,16 @@ class GameModel extends ChangeNotifier {
     return _singleton;
   }
 
-  Map<GameSide, int> scoreMap = {};
-  Map<GameSide, int> numOfA = {};
-  Map<GameSide, int> totalScoreMap = {};
+  late Map<GameSide, int> scoreMap;
+  late Map<GameSide, int> numOfA;
+  late Map<GameSide, int> totalScoreMap;
   GameSide? lastWinner;
 
   static const scoreWin = 99;
   static const maxRoundOfA = 2;
 
-  static LinkedHashMap<int, String> _scoreToStringMap = LinkedHashMap();
-  static LinkedHashMap<String, int> _stringToScoreMap = LinkedHashMap();
+  static late LinkedHashMap<int, String> _scoreToStringMap;
+  static late LinkedHashMap<String, int> _stringToScoreMap;
 
   GameModel._internal() {
     GameModel._buildScoreToStringMaps();
@@ -68,6 +69,17 @@ class GameModel extends ChangeNotifier {
       // win this round
       totalScoreMap.update(side, (value) => ++value);
       scoreMap[side] = scoreWin;
+
+      final leftScore = scoreMap[GameSide.left];
+      final rightScore = scoreMap[GameSide.right];
+      if (leftScore != null && rightScore != null) {
+        final leftString = _scoreToStringMap[leftScore];
+        final rightString = _scoreToStringMap[rightScore];
+        if (leftString != null && rightString != null) {
+          HistoryModel().saveRound(leftString, rightString);
+        }
+      }
+
       notifyListeners();
       return;
     }
@@ -139,7 +151,7 @@ class GameModel extends ChangeNotifier {
   }
 
   GameSide? winnerSide() {
-    for (GameSide side in scoreMap.keys) {
+    for (final side in scoreMap.keys) {
       if (scoreMap[side] == scoreWin) {
         return side;
       }
@@ -161,9 +173,11 @@ class GameModel extends ChangeNotifier {
       scoreWin: '胜',
     });
     _stringToScoreMap = LinkedHashMap();
-    for (var key in _scoreToStringMap.keys) {
-      var val = _scoreToStringMap[key];
-      _stringToScoreMap[val!] = key;
+    for (final key in _scoreToStringMap.keys) {
+      final val = _scoreToStringMap[key];
+      if (val != null) {
+        _stringToScoreMap[val] = key;
+      }
     }
   }
 
